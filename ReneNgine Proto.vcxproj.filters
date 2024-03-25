@@ -13,10 +13,53 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{201387fc-4e23-4faa-9559-b3d895c2144e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\compiled">
+      <UniqueIdentifier>{2dda8810-ad6a-4399-8f0f-a5a8ba4bf87c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rne_window.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rne_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rne_app.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rne_pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rne_app.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rne_pipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vertex.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="fragment.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="compile_shaders.bat">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="vertex.vert.spv">
+      <Filter>Resource Files\shaders\compiled</Filter>
+    </None>
+    <None Include="fragment.frag.spv">
+      <Filter>Resource Files\shaders\compiled</Filter>
+    </None>
   </ItemGroup>
 </Project>

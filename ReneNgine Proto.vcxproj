@@ -137,7 +137,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="rne_app.cpp" />
+    <ClCompile Include="rne_pipeline.cpp" />
+    <ClCompile Include="rne_window.cpp" />
+    <ClCompile Include="rne_window.hpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rne_app.hpp" />
+    <ClInclude Include="rne_pipeline.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="compile_shaders.bat" />
+    <None Include="fragment.frag" />
+    <None Include="fragment.frag.spv" />
+    <None Include="vertex.vert" />
+    <None Include="vertex.vert.spv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

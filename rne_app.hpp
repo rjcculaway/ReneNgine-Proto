@@ -2,6 +2,7 @@
 
 #include "rne_window.hpp"
 #include "rne_pipeline.hpp"
+#include "rne_device.hpp"
 
 namespace rne {
 	class RneApp {
@@ -12,6 +13,7 @@ namespace rne {
 		void run();
 	private:
 		RneWindow rneWindow{ WIDTH, HEIGHT, "ReneNgine Proto" };
-		RnePipeline rnePipeline { "./vertex.vert.spv", "./fragment.frag.spv" };
+		RneDevice rneDevice{ rneWindow };
+		RnePipeline rnePipeline { rneDevice, "./vertex.vert.spv", "./fragment.frag.spv", RnePipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
 	};
 }

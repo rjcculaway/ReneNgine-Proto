@@ -12,10 +12,11 @@ namespace rne {
 		RneWindow(int w, int h, std::string name);
 		~RneWindow();
 
-		//RneWindow(const RneWindow&) = delete;
-		//RneWindow &operator=(const RneWindow&) = delete;
+		RneWindow(const RneWindow&) = delete;
+		RneWindow &operator=(const RneWindow&) = delete;
 
 		bool shouldClose() { return glfwWindowShouldClose(window); }
+		void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 	private:
 		void initWindow();
 

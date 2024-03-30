@@ -531,4 +531,4 @@ void RneDevice::createImageWithInfo(
   }
 }
 
-}  // namespace lve
+}  // namespace rne

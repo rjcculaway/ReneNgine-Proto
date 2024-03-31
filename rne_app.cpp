@@ -1,4 +1,5 @@
 #include "rne_app.hpp"
+#include "rne_vertex_generator.hpp"
 
 #include <stdexcept>
 #include <array>
@@ -6,6 +7,7 @@
 namespace rne {
 
 	RneApp::RneApp() {
+		loadModels();
 		createPipelineLayout();
 		createPipeline();
 		createCommandBuffers();
@@ -13,6 +15,16 @@ namespace rne {
 
 	RneApp::~RneApp() {
 		vkDestroyPipelineLayout(rneDevice.device(), pipelineLayout, nullptr);
+	}
+
+	void RneApp::loadModels() {
+		//std::vector<RneModel::Vertex> vertices{
+		//	{{0.0f, -0.5f}},
+		//	{{0.5f, 0.5f}},
+		//	{{-0.5f, 0.5f}}
+		//};
+
+		rneModel = std::make_unique<RneModel>(rneDevice, RneVertexGenerator::siepernski_triangle(7));
 	}
 
 	void RneApp::createPipelineLayout() {
@@ -77,7 +89,8 @@ namespace rne {
 			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			rnePipeline->bind(commandBuffers[i]);
-			vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+			rneModel->bind(commandBuffers[i]);
+			rneModel->draw(commandBuffers[i]);
 
 			vkCmdEndRenderPass(commandBuffers[i]);
 

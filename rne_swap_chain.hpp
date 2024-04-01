@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.h>
 
 // std lib headers
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,7 @@ class RneSwapChain {
   static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
   RneSwapChain(RneDevice &deviceRef, VkExtent2D windowExtent);
+  RneSwapChain(RneDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<RneSwapChain> previous);
   ~RneSwapChain();
 
   RneSwapChain(const RneSwapChain &) = delete;
@@ -45,6 +47,7 @@ class RneSwapChain {
   void createRenderPass();
   void createFramebuffers();
   void createSyncObjects();
+  void init();
 
   // Helper functions
   VkSurfaceFormatKHR chooseSwapSurfaceFormat(
@@ -69,6 +72,7 @@ class RneSwapChain {
   VkExtent2D windowExtent;
 
   VkSwapchainKHR swapChain;
+  std::shared_ptr<RneSwapChain> oldSwapChain;
 
   std::vector<VkSemaphore> imageAvailableSemaphores;
   std::vector<VkSemaphore> renderFinishedSemaphores;

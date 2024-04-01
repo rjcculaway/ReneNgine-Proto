@@ -8,17 +8,20 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
+#include "rne_swap_chain.hpp"
 
 namespace rne {
 
-RneSwapChain::RneSwapChain(RneDevice &deviceRef, VkExtent2D extent)
-    : device{deviceRef}, windowExtent{extent} {
-  createSwapChain();
-  createImageViews();
-  createRenderPass();
-  createDepthResources();
-  createFramebuffers();
-  createSyncObjects();
+RneSwapChain::RneSwapChain(RneDevice& deviceRef, VkExtent2D extent)
+    : device{ deviceRef }, windowExtent{ extent } {
+    init();
+}
+
+RneSwapChain::RneSwapChain(RneDevice& deviceRef, VkExtent2D extent, std::shared_ptr<RneSwapChain> previous) : device{deviceRef}, windowExtent{extent}, oldSwapChain{previous} {
+    init();
+
+    // cleanup old swap chain
+    oldSwapChain = nullptr;
 }
 
 RneSwapChain::~RneSwapChain() {
@@ -162,7 +165,8 @@ void RneSwapChain::createSwapChain() {
   createInfo.presentMode = presentMode;
   createInfo.clipped = VK_TRUE;
 
-  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
+  
 
   if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
     throw std::runtime_error("failed to create swap chain!");
@@ -357,6 +361,15 @@ void RneSwapChain::createSyncObjects() {
       throw std::runtime_error("failed to create synchronization objects for a frame!");
     }
   }
+}
+
+void RneSwapChain::init() {
+    createSwapChain();
+    createImageViews();
+    createRenderPass();
+    createDepthResources();
+    createFramebuffers();
+    createSyncObjects();
 }
 
 VkSurfaceFormatKHR RneSwapChain::chooseSwapSurfaceFormat(

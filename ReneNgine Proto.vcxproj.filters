@@ -59,13 +59,13 @@
     <ClInclude Include="rne_device.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rne_swap_chain.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="rne_model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="rne_vertex_generator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rne_swap_chain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

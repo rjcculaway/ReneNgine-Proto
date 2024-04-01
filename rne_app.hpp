@@ -28,11 +28,14 @@ namespace rne {
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
+		void freeCommandBuffers();
 		void drawFrame();
+		void recreateSwapChain();
+		void recordCommandBuffer(int imageIndex);
 
 		RneWindow rneWindow{ WIDTH, HEIGHT, "ReneNgine Proto" };
 		RneDevice rneDevice{ rneWindow };
-		RneSwapChain rneSwapChain{ rneDevice, rneWindow.getExtent() };
+		std::unique_ptr<RneSwapChain> rneSwapChain;
 		std::unique_ptr<RnePipeline> rnePipeline;
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;

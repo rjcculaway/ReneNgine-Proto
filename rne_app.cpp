@@ -9,7 +9,7 @@ namespace rne {
 	RneApp::RneApp() {
 		loadModels();
 		createPipelineLayout();
-		createPipeline();
+		recreateSwapChain();
 		createCommandBuffers();
 	}
 
@@ -24,7 +24,7 @@ namespace rne {
 		//	{{-0.5f, 0.5f}}
 		//};
 
-		rneModel = std::make_unique<RneModel>(rneDevice, RneVertexGenerator::siepernski_triangle(7));
+		rneModel = std::make_unique<RneModel>(rneDevice, RneVertexGenerator::sierpinski_triangle(7));
 	}
 
 	void RneApp::createPipelineLayout() {
@@ -41,8 +41,13 @@ namespace rne {
 		}
 	}
 	void RneApp::createPipeline() {
-		auto pipelineConfig = RnePipeline::defaultPipelineConfigInfo(rneSwapChain.width(), rneSwapChain.height());
-		pipelineConfig.renderPass = rneSwapChain.getRenderPass();
+		assert(rneSwapChain != nullptr && "Cannot create pipeline before swapchain");
+		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+
+		PipelineConfigInfo pipelineConfig{};
+		RnePipeline::defaultPipelineConfigInfo(pipelineConfig);
+		pipelineConfig.renderPass = rneSwapChain->getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		rnePipeline = std::make_unique<RnePipeline>(
 			rneDevice, 
@@ -50,8 +55,32 @@ namespace rne {
 			"./fragment.frag.spv", 
 			pipelineConfig);
 	}
+
+	void RneApp::recreateSwapChain() {
+		auto extent = rneWindow.getExtent();
+
+		while (extent.width == 0 || extent.height == 0) {
+			extent = rneWindow.getExtent();
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(rneDevice.device());
+		if (rneSwapChain == nullptr) {
+			rneSwapChain = std::make_unique<RneSwapChain>(rneDevice, extent);
+		}
+		else {
+			rneSwapChain = std::make_unique<RneSwapChain>(rneDevice, extent, std::move(rneSwapChain));
+			if (rneSwapChain->imageCount() != commandBuffers.size()) {
+				freeCommandBuffers();
+				createCommandBuffers();
+			}
+		}
+
+		createPipeline();
+	}
+
 	void RneApp::createCommandBuffers() {
-		commandBuffers.resize(rneSwapChain.imageCount());
+		commandBuffers.resize(rneSwapChain->imageCount());
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -62,53 +91,82 @@ namespace rne {
 		if (vkAllocateCommandBuffers(rneDevice.device(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
 			throw std::runtime_error("Failed to allocate command buffers");
 		}
+	}
 
-		for (int i = 0; i < commandBuffers.size(); i++) {
-			VkCommandBufferBeginInfo beginInfo{};
-			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	void RneApp::freeCommandBuffers()
+	{
+		vkFreeCommandBuffers(rneDevice.device(), rneDevice.getCommandPool(), static_cast<float>(commandBuffers.size()), commandBuffers.data());
+		commandBuffers.clear();
+	}
 
-			if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-				throw std::runtime_error("Failed to begin recording command buffer");
-			}
+	void RneApp::recordCommandBuffer(int imageIndex) {
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-			VkRenderPassBeginInfo renderPassInfo{};
-			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			renderPassInfo.renderPass = rneSwapChain.getRenderPass();
-			renderPassInfo.framebuffer = rneSwapChain.getFrameBuffer(i);
+		if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
+			throw std::runtime_error("Failed to begin recording command buffer");
+		}
 
-			renderPassInfo.renderArea.offset = { 0, 0 };
-			renderPassInfo.renderArea.extent = rneSwapChain.getSwapChainExtent();
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = rneSwapChain->getRenderPass();
+		renderPassInfo.framebuffer = rneSwapChain->getFrameBuffer(imageIndex);
 
-			std::array<VkClearValue, 2> clearValues{};
-			clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
-			clearValues[1].depthStencil = { 1.0f, 0 };
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = rneSwapChain->getSwapChainExtent();
 
-			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-			renderPassInfo.pClearValues = clearValues.data();
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
+		clearValues[1].depthStencil = { 1.0f, 0 };
 
-			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
 
-			rnePipeline->bind(commandBuffers[i]);
-			rneModel->bind(commandBuffers[i]);
-			rneModel->draw(commandBuffers[i]);
+		vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			vkCmdEndRenderPass(commandBuffers[i]);
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(rneSwapChain->getSwapChainExtent().width);
+		viewport.height = static_cast<float>(rneSwapChain->getSwapChainExtent().height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		VkRect2D scissor{ {0, 0}, rneSwapChain->getSwapChainExtent() };
+		vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
+		vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
 
-			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-				throw std::runtime_error("Failed to end recording command buffer");
-			}
+		rnePipeline->bind(commandBuffers[imageIndex]);
+		rneModel->bind(commandBuffers[imageIndex]);
+		rneModel->draw(commandBuffers[imageIndex]);
+
+		vkCmdEndRenderPass(commandBuffers[imageIndex]);
+
+		if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
+			throw std::runtime_error("Failed to end recording command buffer");
 		}
 	}
+
 	void RneApp::drawFrame() {
 		uint32_t imageIndex;
 
-		auto result = rneSwapChain.acquireNextImage(&imageIndex);
+		auto result = rneSwapChain->acquireNextImage(&imageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			recreateSwapChain();
+			return;
+		}
 
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			throw std::runtime_error("Failed to acquire swap chain image");
 		}
 
-		result = rneSwapChain.submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
+		recordCommandBuffer(imageIndex);
+		result = rneSwapChain->submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || rneWindow.wasWindowResized()) {
+			rneWindow.resetWindowResizedFlag();
+			recreateSwapChain();
+			return;
+		}
 		if (result != VK_SUCCESS) {
 			throw std::runtime_error("failed to submit command buffer");
 		}

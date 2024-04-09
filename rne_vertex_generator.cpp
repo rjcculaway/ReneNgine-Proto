@@ -3,6 +3,13 @@
 #include <glm/common.hpp>
 
 namespace rne {
+	std::vector<RneModel::Vertex> RneVertexGenerator::triangle() {
+		return std::vector<RneModel::Vertex> {
+			{{0.0f, -0.5f}},
+			{{0.5f, 0.5f}},
+			{{-0.5f, 0.5f}}
+		};
+	}
 	std::vector<RneModel::Vertex> RneVertexGenerator::sierpinski_triangle(const unsigned int &iter) {
 		std::vector<RneModel::Vertex> triangles{
 			{{0.0f, -1.0f}, {1.0f, 0.0f, 0.0f}},
@@ -13,7 +20,7 @@ namespace rne {
 		unsigned int current_triangles = 0;
 
 		for (unsigned int i = 0; i < iter; i++) {
-			current_triangles = triangles.size() / 3;
+			current_triangles = static_cast<unsigned int>(triangles.size()) / 3;
 			while (current_triangles > 0) {
 				RneModel::Vertex v1 = triangles.front();
 				triangles.erase(triangles.begin());

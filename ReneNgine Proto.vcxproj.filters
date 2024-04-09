@@ -79,11 +79,5 @@
     <None Include="compile_shaders.bat">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="vertex.vert.spv">
-      <Filter>Resource Files\shaders\compiled</Filter>
-    </None>
-    <None Include="fragment.frag.spv">
-      <Filter>Resource Files\shaders\compiled</Filter>
-    </None>
   </ItemGroup>
 </Project>

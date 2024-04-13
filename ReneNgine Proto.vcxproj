@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="rne_device.hpp" />
     <ClInclude Include="rne_app.hpp" />
+    <ClInclude Include="rne_game_object.hpp" />
     <ClInclude Include="rne_model.hpp" />
     <ClInclude Include="rne_pipeline.hpp" />
     <ClInclude Include="rne_swap_chain.hpp" />

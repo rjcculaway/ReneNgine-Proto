@@ -6,6 +6,7 @@
 #include "rne_swap_chain.hpp"
 #include "rne_window.hpp"
 #include "rne_model.hpp"
+#include "rne_game_object.hpp"
 
 #include <memory>
 #include <vector>
@@ -24,7 +25,7 @@ namespace rne {
 
 		void run();
 	private:
-		void loadModels();
+		void loadGameObjects();
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
@@ -32,6 +33,7 @@ namespace rne {
 		void drawFrame();
 		void recreateSwapChain();
 		void recordCommandBuffer(int imageIndex);
+		void renderGameObjects(VkCommandBuffer commandBuffer);
 
 		RneWindow rneWindow{ WIDTH, HEIGHT, "ReneNgine Proto" };
 		RneDevice rneDevice{ rneWindow };
@@ -39,7 +41,7 @@ namespace rne {
 		std::unique_ptr<RnePipeline> rnePipeline;
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
-		std::unique_ptr<RneModel> rneModel;
+		std::vector<RneGameObject> gameObjects;
 		//RnePipeline rnePipeline { rneDevice, "./vertex.vert.spv", "./fragment.frag.spv", RnePipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
 	};
 }

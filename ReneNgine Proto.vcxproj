@@ -151,11 +151,13 @@
     <ClCompile Include="rne_app.cpp" />
     <ClCompile Include="rne_model.cpp" />
     <ClCompile Include="rne_pipeline.cpp" />
+    <ClCompile Include="rne_renderer.cpp" />
     <ClCompile Include="rne_swap_chain.cpp" />
     <ClCompile Include="rne_vertex_generator.cpp" />
     <ClCompile Include="rne_window.cpp" />
     <ClCompile Include="rne_window.hpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="simple_render_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rne_device.hpp" />
@@ -163,8 +165,10 @@
     <ClInclude Include="rne_game_object.hpp" />
     <ClInclude Include="rne_model.hpp" />
     <ClInclude Include="rne_pipeline.hpp" />
+    <ClInclude Include="rne_renderer.hpp" />
     <ClInclude Include="rne_swap_chain.hpp" />
     <ClInclude Include="rne_vertex_generator.hpp" />
+    <ClInclude Include="simple_render_system.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="compile_shaders.bat" />

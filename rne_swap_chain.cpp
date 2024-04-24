@@ -8,7 +8,6 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
-#include "rne_swap_chain.hpp"
 
 namespace rne {
 
@@ -293,6 +292,7 @@ void RneSwapChain::createFramebuffers() {
 
 void RneSwapChain::createDepthResources() {
   VkFormat depthFormat = findDepthFormat();
+  swapChainDepthFormat = depthFormat;
   VkExtent2D swapChainExtent = getSwapChainExtent();
 
   depthImages.resize(imageCount());

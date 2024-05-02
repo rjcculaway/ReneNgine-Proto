@@ -86,20 +86,20 @@ namespace rne {
 	}
 
 	void RneRenderer::endFrame() {
-		assert(isFrameStarted && "Cannot end frame without frame in progress");
+		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
 		auto commandBuffer = getCurrentCommandBuffer();
-
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to end recording command buffer");
+			throw std::runtime_error("failed to record command buffer!");
 		}
 
 		auto result = rneSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || rneWindow.wasWindowResized()) {
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
+			rneWindow.wasWindowResized()) {
 			rneWindow.resetWindowResizedFlag();
 			recreateSwapChain();
 		}
-		if (result != VK_SUCCESS) {
-			throw std::runtime_error("failed to submit command buffer");
+		else if (result != VK_SUCCESS) {
+			throw std::runtime_error("failed to present swap chain image!");
 		}
 
 		isFrameStarted = false;

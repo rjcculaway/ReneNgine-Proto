@@ -5,16 +5,16 @@
 namespace rne {
 	std::vector<RneModel::Vertex> RneVertexGenerator::triangle() {
 		return std::vector<RneModel::Vertex> {
-			{{0.0f, -0.5f}},
-			{{0.5f, 0.5f}},
-			{{-0.5f, 0.5f}}
+			{{0.0f, -0.5f, 0.5f}},
+			{{0.5f, 0.5f, 0.5f}},
+			{{-0.5f, 0.5f, 0.5f}}
 		};
 	}
 	std::vector<RneModel::Vertex> RneVertexGenerator::sierpinski_triangle(const unsigned int &iter) {
 		std::vector<RneModel::Vertex> triangles{
-			{{0.0f, -1.0f}, {1.0f, 0.0f, 0.0f}},
-			{{1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
-			{{-1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}
+			{{0.0f, -1.0f, 0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{1.0f, 1.0f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{-1.0f, 1.0f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 		};
 		
 		unsigned int current_triangles = 0;
@@ -36,19 +36,19 @@ namespace rne {
 				RneModel::Vertex half_v3 = { v3.position * 0.5f, v3.color * 0.5f };
 
 				// each triangle in clockwise starting from the top
-				glm::vec2 t1_offset = v1.position - half_v1.position;
+				glm::vec3 t1_offset = v1.position - half_v1.position;
 				glm::vec3 t1_color_offset = v1.color - half_v1.color;
 				triangles.push_back({ half_v1.position + t1_offset, half_v1.color + t1_color_offset });
 				triangles.push_back({ half_v2.position + t1_offset, half_v2.color + t1_color_offset });
 				triangles.push_back({ half_v3.position + t1_offset, half_v3.color + t1_color_offset });
 
-				glm::vec2 t2_offset = v2.position - half_v2.position;
+				glm::vec3 t2_offset = v2.position - half_v2.position;
 				glm::vec3 t2_color_offset = v2.color - half_v2.color;
 				triangles.push_back({ half_v1.position + t2_offset, half_v1.color + t2_color_offset });
 				triangles.push_back({ half_v2.position + t2_offset, half_v2.color + t2_color_offset });
 				triangles.push_back({ half_v3.position + t2_offset, half_v3.color + t2_color_offset });
 
-				glm::vec2 t3_offset = v3.position - half_v3.position;
+				glm::vec3 t3_offset = v3.position - half_v3.position;
 				glm::vec3 t3_color_offset = v3.color - half_v3.color;
 				triangles.push_back({ half_v1.position + t3_offset, half_v1.color + t3_color_offset });
 				triangles.push_back({ half_v2.position + t3_offset, half_v2.color + t3_color_offset });

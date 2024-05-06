@@ -147,6 +147,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="rne_camera.cpp" />
     <ClCompile Include="rne_device.cpp" />
     <ClCompile Include="rne_app.cpp" />
     <ClCompile Include="rne_model.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="simple_render_system.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="rne_camera.hpp" />
     <ClInclude Include="rne_device.hpp" />
     <ClInclude Include="rne_app.hpp" />
     <ClInclude Include="rne_game_object.hpp" />

@@ -19,6 +19,7 @@ namespace rne {
         RneRenderer& operator=(const RneRenderer&) = delete;
 
         VkRenderPass getSwapChainRenderPass() const { return rneSwapChain->getRenderPass(); }
+        float getAspectRatio() const { return rneSwapChain->extentAspectRatio(); };
         bool isFrameInProgress() const { return isFrameStarted; }
 
         VkCommandBuffer getCurrentCommandBuffer() const {

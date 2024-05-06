@@ -14,7 +14,7 @@ namespace rne {
 
 		// translate * ry * rx * rz * scale
 		glm::mat4 mat4() {
-			// Tait-Bryan rotation (Y-X-Z), interpreted as an extrinsic rotation (read from right-to-left)
+			// Tait-Bryan rotation (Y(1)-X(2)-Z(3)), interpreted as an extrinsic rotation (read from right-to-left)
 			const float c3 = glm::cos(rotation.z);
 			const float s3 = glm::sin(rotation.z);
 			const float c2 = glm::cos(rotation.x);
@@ -40,7 +40,7 @@ namespace rne {
 					scale.z * (c1 * c2),
 					0.0f,
 				},
-				{translation.x, translation.y, translation.z, 1.0f} 
+				{translation.x, translation.y, translation.z, 1.0f} // A homogeneous coordinate of 1 indicates position, 0 for direction
 			};
 		};
 	};

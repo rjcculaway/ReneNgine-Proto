@@ -1,10 +1,13 @@
 #include "rne_app.hpp"
 #include "rne_vertex_generator.hpp"
+
+#include "keyboard_movement_controller.hpp"
 #include "rne_camera.hpp"
 #include "simple_render_system.hpp"
 
 #include <stdexcept>
 #include <array>
+#include <chrono>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -94,11 +97,23 @@ namespace rne {
         RneCamera camera{};
         //camera.setViewDirection(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
+        
+        auto viewerObject = RneGameObject::createGameObject();
+        KeyboardMovementController cameraController{};
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        
         while (!rneWindow.shouldClose()) {
 			glfwPollEvents();
 
+            auto newTime = std::chrono::high_resolution_clock::now();
+            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            currentTime = newTime;
+
+            cameraController.moveInPlaneXZ(rneWindow.getGLFWwindow(), frameTime, viewerObject);
+            camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+
             float aspect = rneRenderer.getAspectRatio();
-            //camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.1f);
 
 			if (auto commandBuffer = rneRenderer.beginFrame()) {

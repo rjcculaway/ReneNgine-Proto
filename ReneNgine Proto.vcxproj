@@ -104,14 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.239.0\Include;D:\Personal Projects\ReneNgine;D:\Personal Projects\ReneNgine\glfw-3.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.239.0\Include;D:\Personal Projects\ReneNgine;D:\Personal Projects\ReneNgine\glfw-3.4\include;D:\Libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.239.0\Lib;D:\Personal Projects\ReneNgine\glfw-3.4\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.239.0\Lib;D:\Libraries\tiny_obj_loader.h;D:\Personal Projects\ReneNgine\glfw-3.4\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
@@ -128,7 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.239.0\Include;D:\Personal Projects\ReneNgine;D:\Personal Projects\ReneNgine\glfw-3.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.239.0\Include;D:\Personal Projects\ReneNgine;D:\Personal Projects\ReneNgine\glfw-3.4\include;D:\Libraries\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -137,7 +137,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.239.0\Lib;D:\Personal Projects\ReneNgine\glfw-3.4\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.239.0\Lib;D:\Libraries\tiny_obj_loader.h;D:\Personal Projects\ReneNgine\glfw-3.4\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
@@ -155,6 +155,7 @@
     <ClCompile Include="rne_pipeline.cpp" />
     <ClCompile Include="rne_renderer.cpp" />
     <ClCompile Include="rne_swap_chain.cpp" />
+    <ClCompile Include="rne_utils.cpp" />
     <ClCompile Include="rne_vertex_generator.cpp" />
     <ClCompile Include="rne_window.cpp" />
     <ClCompile Include="rne_window.hpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="rne_pipeline.hpp" />
     <ClInclude Include="rne_renderer.hpp" />
     <ClInclude Include="rne_swap_chain.hpp" />
+    <ClInclude Include="rne_utils.hpp" />
     <ClInclude Include="rne_vertex_generator.hpp" />
     <ClInclude Include="simple_render_system.hpp" />
   </ItemGroup>

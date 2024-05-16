@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\shaders\compiled">
       <UniqueIdentifier>{2dda8810-ad6a-4399-8f0f-a5a8ba4bf87c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\models">
+      <UniqueIdentifier>{7abd96ef-e2be-4e1d-9897-5562dd5b40fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -60,6 +63,9 @@
     <ClCompile Include="keyboard_movement_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rne_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rne_app.hpp">
@@ -93,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keyboard_movement_controller.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rne_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

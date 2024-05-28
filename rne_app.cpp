@@ -25,13 +25,23 @@ namespace rne {
 
 
 	void RneApp::loadGameObjects() {
-        std::shared_ptr<RneModel> rneModel = RneModel::createModelFromFile(rneDevice, "models/smooth_vase.obj");
+        // Flat Vase
+        std::shared_ptr<RneModel> rneModel = RneModel::createModelFromFile(rneDevice, "models/flat_vase.obj");
         auto gameObject = RneGameObject::createGameObject();
         gameObject.model = rneModel;
         gameObject.transform.translation = {0.0f, 0.0f, 2.5f};
         gameObject.transform.scale = glm::vec3{ 3.f };
         
         gameObjects.push_back(std::move(gameObject));
+
+        // Smooth Vase
+        std::shared_ptr<RneModel> smoothVaseModel = RneModel::createModelFromFile(rneDevice, "models/smooth_vase.obj");
+        auto smoothVase = RneGameObject::createGameObject();
+        smoothVase.model = smoothVaseModel;
+        smoothVase.transform.translation = { 2.0f, 0.0f, 2.5f };
+        smoothVase.transform.scale = glm::vec3{ 3.f };
+
+        gameObjects.push_back(std::move(smoothVase));
     }
 
 	void RneApp::run() {

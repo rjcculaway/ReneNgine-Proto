@@ -1,8 +1,9 @@
 #include "rne_app.hpp"
-#include "rne_vertex_generator.hpp"
 
 #include "keyboard_movement_controller.hpp"
+#include "rne_buffer.hpp"
 #include "rne_camera.hpp"
+#include "rne_frame_info.hpp"
 #include "simple_render_system.hpp"
 
 #include <stdexcept>
@@ -15,6 +16,11 @@
 #include <glm/gtc/constants.hpp>
 
 namespace rne {
+
+    struct GlobalUbo {
+        glm::mat4 projectionView{ 1.0f };
+        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, -3.0f, 1.0f));
+    };
 
 	RneApp::RneApp() {
 		loadGameObjects();
@@ -45,6 +51,16 @@ namespace rne {
     }
 
 	void RneApp::run() {
+        RneBuffer globalUboBuffer{
+            rneDevice,
+            sizeof(GlobalUbo),
+            RneSwapChain::MAX_FRAMES_IN_FLIGHT,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+            rneDevice.properties.limits.minUniformBufferOffsetAlignment
+        };
+        globalUboBuffer.map();
+
 		SimpleRenderSystem simpleRenderSystem{ rneDevice, rneRenderer.getSwapChainRenderPass() };
         RneCamera camera{};
         //camera.setViewDirection(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
@@ -69,8 +85,24 @@ namespace rne {
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.1f);
 
 			if (auto commandBuffer = rneRenderer.beginFrame()) {
+                int frameIndex = rneRenderer.getFrameIndex();
+
+                FrameInfo frameInfo{
+                    frameIndex,
+                    frameTime,
+                    commandBuffer,
+                    camera
+                };
+
+                // prepare and update objects and memory
+                GlobalUbo ubo{};
+                ubo.projectionView = camera.getProjection() * camera.getView();
+                globalUboBuffer.writeToIndex(&ubo, frameIndex);
+                globalUboBuffer.flushIndex(frameIndex);
+    
+                // render
 				rneRenderer.beginSwapChainRenderPass(commandBuffer);
-				simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+				simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
 				rneRenderer.endSwapChainRenderPass(commandBuffer);
 				rneRenderer.endFrame();
 			}

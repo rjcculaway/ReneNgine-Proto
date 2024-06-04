@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rne_device.hpp"
+#include "rne_buffer.hpp" 
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -51,13 +52,11 @@ namespace rne {
 
 	private:
 		RneDevice& rneDevice;
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
+		std::unique_ptr<RneBuffer> vertexBuffer;
 		uint32_t vertexCount;
 
 		bool hasIndexBuffer = false;
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		std::unique_ptr<RneBuffer> indexBuffer;
 		uint32_t indexCount;
 
 		void createVertexBuffers(const std::vector<Vertex>& vertices);

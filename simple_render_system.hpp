@@ -4,6 +4,7 @@
 #include "rne_device.hpp"
 #include "rne_pipeline.hpp"
 #include "rne_game_object.hpp"
+#include "rne_frame_info.hpp"
 
 #include <memory>
 #include <vector>
@@ -17,7 +18,7 @@ namespace rne {
 		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 		SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<RneGameObject> &gameObjects, const RneCamera& camera);
+		void renderGameObjects(FrameInfo& frameInfo, std::vector<RneGameObject>& gameObjects);
 	private:
 		void createPipelineLayout();
 		void createPipeline(VkRenderPass renderPass);

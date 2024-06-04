@@ -28,15 +28,7 @@ namespace rne {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
-	RneModel::~RneModel() {
-		vkDestroyBuffer(rneDevice.device(), vertexBuffer, nullptr);
-		vkFreeMemory(rneDevice.device(), vertexBufferMemory, nullptr);
-
-		if (hasIndexBuffer) {
-			vkDestroyBuffer(rneDevice.device(), indexBuffer, nullptr);
-			vkFreeMemory(rneDevice.device(), indexBufferMemory, nullptr);
-		}
-	}
+	RneModel::~RneModel() {}
 
 	std::unique_ptr<RneModel> RneModel::createModelFromFile(RneDevice &device, const std::string& filePath) {
 		Builder builder{};
@@ -56,12 +48,12 @@ namespace rne {
 		}
 	}
 	void RneModel::bind(VkCommandBuffer commandBuffer) {
-		VkBuffer buffers[] = { vertexBuffer };
+		VkBuffer buffers[] = { vertexBuffer->getBuffer()};
 		VkDeviceSize offsets[] = {0};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 
 		if (hasIndexBuffer) {
-			vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffer, indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
 	}
 
@@ -70,69 +62,63 @@ namespace rne {
 		assert(vertexCount >= 3 && "Vertex count must be at least 3.");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
 
+		uint32_t vertexSize = sizeof(vertices[0]);
+
 		// Staging buffer to copy to device local memory
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-
-		rneDevice.createBuffer(bufferSize,
+		RneBuffer stagingBuffer{
+			rneDevice,
+			vertexSize,
+			vertexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
-			stagingBuffer, 
-			stagingBufferMemory);
-		
-		void* data;
-		vkMapMemory(rneDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(rneDevice.device(), stagingBufferMemory);
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		};
 
-		rneDevice.createBuffer(bufferSize,
+		stagingBuffer.map();
+		stagingBuffer.writeToBuffer((void*)vertices.data());
+
+		vertexBuffer = std::make_unique<RneBuffer>(
+			rneDevice,
+			vertexSize,
+			vertexCount,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			vertexBuffer,
-			vertexBufferMemory);
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		);
 
 		// Transfer staging buffer to device local vertex buffer
-		rneDevice.copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-		vkDestroyBuffer(rneDevice.device(), stagingBuffer, nullptr);
-		vkFreeMemory(rneDevice.device(), stagingBufferMemory, nullptr);
+		rneDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
 	}
 
 	void RneModel::createIndexBuffers(const std::vector<uint32_t>& indices) {
 		indexCount = static_cast<uint32_t>(indices.size());
+		uint32_t indexSize = sizeof(indices[0]);
+		VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
 		
 		hasIndexBuffer = indexCount > 0;
 		if (!hasIndexBuffer) 
 			return;
 		
-		VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
-
 		// Staging buffer to copy to device local memory
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-
-		rneDevice.createBuffer(bufferSize,
+		RneBuffer stagingBuffer{
+			rneDevice,
+			indexSize,
+			indexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer,
-			stagingBufferMemory);
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		};
 
-		void* data;
-		vkMapMemory(rneDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(rneDevice.device(), stagingBufferMemory);
+		stagingBuffer.map();
+		stagingBuffer.writeToBuffer((void*)indices.data());
 
-		rneDevice.createBuffer(bufferSize,
+		indexBuffer = std::make_unique<RneBuffer>(
+			rneDevice,
+			indexSize,
+			indexCount,
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			indexBuffer,
-			indexBufferMemory);
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		);
 
 		// Transfer staging buffer to device local index buffer
-		rneDevice.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-		vkDestroyBuffer(rneDevice.device(), stagingBuffer, nullptr);
-		vkFreeMemory(rneDevice.device(), stagingBufferMemory, nullptr);
+		rneDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
 
 	std::vector<VkVertexInputBindingDescription> RneModel::Vertex::getBindingDescriptions() {

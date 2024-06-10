@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rne_descriptors.hpp"
 #include "rne_device.hpp"
 #include "rne_game_object.hpp"
 #include "rne_renderer.hpp"
@@ -27,6 +28,9 @@ namespace rne {
 		RneWindow rneWindow{ WIDTH, HEIGHT, "ReneNgine Proto" };
 		RneDevice rneDevice{ rneWindow };
 		RneRenderer rneRenderer{ rneWindow, rneDevice };
+
+		// order of declarations matters
+		std::unique_ptr<RneDescriptorPool> globalPool{};
 
 		std::vector<RneGameObject> gameObjects;
 		//RnePipeline rnePipeline { rneDevice, "./vertex.vert.spv", "./fragment.frag.spv", RnePipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};

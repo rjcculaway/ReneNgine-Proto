@@ -150,6 +150,7 @@
     <ClCompile Include="keyboard_movement_controller.cpp" />
     <ClCompile Include="rne_buffer.cpp" />
     <ClCompile Include="rne_camera.cpp" />
+    <ClCompile Include="rne_descriptors.cpp" />
     <ClCompile Include="rne_device.cpp" />
     <ClCompile Include="rne_app.cpp" />
     <ClCompile Include="rne_game_object.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="keyboard_movement_controller.hpp" />
     <ClInclude Include="rne_buffer.hpp" />
     <ClInclude Include="rne_camera.hpp" />
+    <ClInclude Include="rne_descriptors.hpp" />
     <ClInclude Include="rne_device.hpp" />
     <ClInclude Include="rne_app.hpp" />
     <ClInclude Include="rne_frame_info.hpp" />

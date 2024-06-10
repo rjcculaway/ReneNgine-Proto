@@ -12,7 +12,7 @@
 namespace rne {
 	class SimpleRenderSystem {
 	public:
-		SimpleRenderSystem(RneDevice& device, VkRenderPass renderPass);
+		SimpleRenderSystem(RneDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~SimpleRenderSystem();
 
 		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
@@ -20,7 +20,7 @@ namespace rne {
 
 		void renderGameObjects(FrameInfo& frameInfo, std::vector<RneGameObject>& gameObjects);
 	private:
-		void createPipelineLayout();
+		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
 
 		RneDevice& rneDevice;

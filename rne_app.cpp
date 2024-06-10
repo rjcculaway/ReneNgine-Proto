@@ -18,11 +18,15 @@
 namespace rne {
 
     struct GlobalUbo {
-        glm::mat4 projectionView{ 1.0f };
-        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, -3.0f, 1.0f));
+        alignas(16) glm::mat4 projectionView{ 1.0f };
+        alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f));
     };
 
 	RneApp::RneApp() {
+        globalPool = RneDescriptorPool::Builder(rneDevice)
+            .setMaxSets(RneSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, RneSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
 		loadGameObjects();
 	}
 
@@ -51,17 +55,33 @@ namespace rne {
     }
 
 	void RneApp::run() {
-        RneBuffer globalUboBuffer{
-            rneDevice,
-            sizeof(GlobalUbo),
-            RneSwapChain::MAX_FRAMES_IN_FLIGHT,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-            rneDevice.properties.limits.minUniformBufferOffsetAlignment
-        };
-        globalUboBuffer.map();
 
-		SimpleRenderSystem simpleRenderSystem{ rneDevice, rneRenderer.getSwapChainRenderPass() };
+        std::vector<std::unique_ptr<RneBuffer>> uboBuffers(RneSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<RneBuffer>(
+                rneDevice,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                rneDevice.properties.limits.minUniformBufferOffsetAlignment
+            );
+            uboBuffers[i]->map();
+        }
+        
+        auto globalSetLayout = RneDescriptorSetLayout::Builder(rneDevice)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets(RneSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            RneDescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
+		SimpleRenderSystem simpleRenderSystem{ rneDevice, rneRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         RneCamera camera{};
         //camera.setViewDirection(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
@@ -91,14 +111,15 @@ namespace rne {
                     frameIndex,
                     frameTime,
                     commandBuffer,
-                    camera
+                    camera,
+                    globalDescriptorSets[frameIndex]
                 };
 
                 // prepare and update objects and memory
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjection() * camera.getView();
-                globalUboBuffer.writeToIndex(&ubo, frameIndex);
-                globalUboBuffer.flushIndex(frameIndex);
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
     
                 // render
 				rneRenderer.beginSwapChainRenderPass(commandBuffer);

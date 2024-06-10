@@ -10,5 +10,6 @@ namespace rne {
 		float frameTime;
 		VkCommandBuffer commandBuffer;
 		RneCamera &camera;
+		VkDescriptorSet globalDescriptorSet;
 	};
 }

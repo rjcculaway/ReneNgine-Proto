@@ -19,7 +19,9 @@ namespace rne {
 
     struct GlobalUbo {
         alignas(16) glm::mat4 projectionView{ 1.0f };
-        alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f));
+        glm::vec4 ambientLightColor{1.0f, 1.0f, 1.0f, 0.02f}; // w is light intensity
+        glm::vec3 lightPosition{ -1.0f };
+        alignas(16) glm::vec4 lightColor{ 1.0f }; // w is light intensity
     };
 
 	RneApp::RneApp() {
@@ -39,7 +41,7 @@ namespace rne {
         std::shared_ptr<RneModel> rneModel = RneModel::createModelFromFile(rneDevice, "models/flat_vase.obj");
         auto gameObject = RneGameObject::createGameObject();
         gameObject.model = rneModel;
-        gameObject.transform.translation = {0.0f, 0.0f, 2.5f};
+        gameObject.transform.translation = {0.0f, 0.0f, 0.0f};
         gameObject.transform.scale = glm::vec3{ 3.f };
         
         gameObjects.push_back(std::move(gameObject));
@@ -48,10 +50,19 @@ namespace rne {
         std::shared_ptr<RneModel> smoothVaseModel = RneModel::createModelFromFile(rneDevice, "models/smooth_vase.obj");
         auto smoothVase = RneGameObject::createGameObject();
         smoothVase.model = smoothVaseModel;
-        smoothVase.transform.translation = { 2.0f, 0.0f, 2.5f };
+        smoothVase.transform.translation = { 2.0f, 0.0f, 0.0f };
         smoothVase.transform.scale = glm::vec3{ 3.f };
 
         gameObjects.push_back(std::move(smoothVase));
+
+        // Floor
+        std::shared_ptr<RneModel> floorModel = RneModel::createModelFromFile(rneDevice, "models/quad.obj");
+        auto floor = RneGameObject::createGameObject();
+        floor.model = floorModel;
+        floor.transform.translation = { 0.5f, 0.5f, 0.0f };
+        floor.transform.scale = glm::vec3{ 3.f };
+
+        gameObjects.push_back(std::move(floor));
     }
 
 	void RneApp::run() {
@@ -87,6 +98,7 @@ namespace rne {
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
         
         auto viewerObject = RneGameObject::createGameObject();
+        viewerObject.transform.translation.z = -2.5f;
         KeyboardMovementController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -102,7 +114,7 @@ namespace rne {
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = rneRenderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.1f);
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.1f);
 
 			if (auto commandBuffer = rneRenderer.beginFrame()) {
                 int frameIndex = rneRenderer.getFrameIndex();

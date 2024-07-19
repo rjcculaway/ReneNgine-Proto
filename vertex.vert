@@ -11,7 +11,9 @@ layout (location = 2) out vec3 fragUv;
 
 layout (set = 0, binding = 0) uniform GlobalUbo {
 	mat4 projectionViewMatrix;
-	vec3 directionToLight;
+	vec4 ambientLightColor; // w is light intensity
+	vec3 lightPosition;
+	vec4 lightColor;
 } ubo;
 
 layout (push_constant) uniform Push {
@@ -22,7 +24,9 @@ layout (push_constant) uniform Push {
 const float AMBIENT = 0.02;
 
 void main() {
-	gl_Position = ubo.projectionViewMatrix * push.modelMatrix * vec4(position, 1.0);
+	vec4 positionWorld = push.modelMatrix * vec4(position, 1.0);
+	gl_Position = ubo.projectionViewMatrix * positionWorld;
+
 
 	// the normal matrix is the transpose of the inverse of the model matrix
 	// inverse() is expensive, so we construct the normal matrix by hand
@@ -31,9 +35,14 @@ void main() {
 	// the inverse of the scale matrix is simply the reciprocal of each element
 	// mat4 normalMatrix = transpose(inverse(push.modelMatrix))
 	vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal); // convert normal to world space
-	float lightIntensity = max(dot(normalWorldSpace, ubo.directionToLight), 0.0);
+	vec3 directionToLight = ubo.lightPosition - positionWorld.xyz;
+	float attenuation = 1.0 / dot(directionToLight, directionToLight); // distance squared
 
-	fragColor = color * lightIntensity + AMBIENT;
+	vec3 lightColor = ubo.lightColor.xyz * ubo.lightColor.w * attenuation;
+	vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+	vec3 diffuseLight = lightColor * max(dot(normalWorldSpace, directionToLight), 0.0);
+
+	fragColor = color * diffuseLight + ambientLight;
 	fragNormal = normal;
 	fragUv = fragUv;
 }

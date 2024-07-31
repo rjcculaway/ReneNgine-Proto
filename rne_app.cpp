@@ -44,7 +44,7 @@ namespace rne {
         gameObject.transform.translation = {0.0f, 0.0f, 0.0f};
         gameObject.transform.scale = glm::vec3{ 3.f };
         
-        gameObjects.push_back(std::move(gameObject));
+        gameObjects.emplace(gameObject.getId(), std::move(gameObject));
 
         // Smooth Vase
         std::shared_ptr<RneModel> smoothVaseModel = RneModel::createModelFromFile(rneDevice, "models/smooth_vase.obj");
@@ -53,7 +53,7 @@ namespace rne {
         smoothVase.transform.translation = { 2.0f, 0.0f, 0.0f };
         smoothVase.transform.scale = glm::vec3{ 3.f };
 
-        gameObjects.push_back(std::move(smoothVase));
+        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         // Floor
         std::shared_ptr<RneModel> floorModel = RneModel::createModelFromFile(rneDevice, "models/quad.obj");
@@ -62,7 +62,7 @@ namespace rne {
         floor.transform.translation = { 0.5f, 0.5f, 0.0f };
         floor.transform.scale = glm::vec3{ 3.f };
 
-        gameObjects.push_back(std::move(floor));
+        gameObjects.emplace(floor.getId(), std::move(floor));
     }
 
 	void RneApp::run() {
@@ -81,7 +81,7 @@ namespace rne {
         }
         
         auto globalSetLayout = RneDescriptorSetLayout::Builder(rneDevice)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
             .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(RneSwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -124,7 +124,8 @@ namespace rne {
                     frameTime,
                     commandBuffer,
                     camera,
-                    globalDescriptorSets[frameIndex]
+                    globalDescriptorSets[frameIndex],
+                    gameObjects
                 };
 
                 // prepare and update objects and memory
@@ -135,7 +136,7 @@ namespace rne {
     
                 // render
 				rneRenderer.beginSwapChainRenderPass(commandBuffer);
-				simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
+				simpleRenderSystem.renderGameObjects(frameInfo);
 				rneRenderer.endSwapChainRenderPass(commandBuffer);
 				rneRenderer.endFrame();
 			}

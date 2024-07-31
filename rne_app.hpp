@@ -32,7 +32,7 @@ namespace rne {
 		// order of declarations matters
 		std::unique_ptr<RneDescriptorPool> globalPool{};
 
-		std::vector<RneGameObject> gameObjects;
+		RneGameObject::Map gameObjects;
 		//RnePipeline rnePipeline { rneDevice, "./vertex.vert.spv", "./fragment.frag.spv", RnePipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
 	};
 }

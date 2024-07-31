@@ -60,7 +60,7 @@ namespace rne {
 			pipelineConfig);
 	}
 
-	void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo, std::vector<RneGameObject>& gameObjects) {
+	void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo) {
 		rnePipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -72,8 +72,8 @@ namespace rne {
 			0,
 			nullptr);
 
-		for (auto& obj : gameObjects) {
-
+		for (auto& kv : frameInfo.gameObjects) {
+			auto& obj = kv.second;
 			SimplePushConstantData push{};
 			push.modelMatrix = obj.transform.mat4();
 			push.normalMatrix = obj.transform.normalMatrix();

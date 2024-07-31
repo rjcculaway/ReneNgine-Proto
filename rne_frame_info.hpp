@@ -11,5 +11,6 @@ namespace rne {
 		VkCommandBuffer commandBuffer;
 		RneCamera &camera;
 		VkDescriptorSet globalDescriptorSet;
+		RneGameObject::Map& gameObjects;
 	};
 }

@@ -3,7 +3,10 @@
 #include "rne_model.hpp"
 // libs
 #include <glm/gtc/matrix_transform.hpp>
+
+// standard
 #include <memory>
+#include <unordered_map>
 
 namespace rne {
 
@@ -20,6 +23,7 @@ namespace rne {
 	class RneGameObject {
 	public:
 		using id_t = unsigned int;
+		using Map = std::unordered_map<id_t, RneGameObject>;
 
 		static RneGameObject createGameObject() {
 			static id_t currentId = 0;
